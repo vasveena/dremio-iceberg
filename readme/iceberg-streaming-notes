@@ -1,0 +1,67 @@
+Create an MSK cluster
+
+On EC2 instance (Kafka Producer)
+
+sudo su
+which python3
+curl -O https://bootstrap.pypa.io/get-pip.py
+python3 get-pip.py --user
+which pip
+
+sudo /root/.local/bin/pip install protobuf
+sudo /root/.local/bin/pip install requests
+sudo /root/.local/bin/pip install kafka-python
+sudo /root/.local/bin/pip install --upgrade gtfs-realtime-bindings
+sudo /root/.local/bin/pip install underground
+sudo /root/.local/bin/pip install pathlib
+
+exit
+
+sudo yum install java-1.8.0
+wget https://archive.apache.org/dist/kafka/2.2.1/kafka_2.12-2.2.1.tgz
+tar -xzf kafka_2.12-2.2.1.tgz
+
+aws kafka describe-cluster --cluster-arn arn:aws:kafka:us-east-1:620614497509:cluster/test/2dbb304e-79fe-4beb-a02d-35e0fea4524b-2 | grep ZookeeperConnectString
+
+Delete Kafka Topic if existing (replace zookeeper string)
+
+/home/ec2-user/kafka_2.12-2.2.1/bin/kafka-topics.sh --zookeeper "z-3.test.1tklkx.c2.kafka.us-east-1.amazonaws.com:2181,z-2.test.1tklkx.c2.kafka.us-east-1.amazonaws.com:2181,z-1.test.1tklkx.c2.kafka.us-east-1.amazonaws.com:2181" --delete --topic trip_update_topic
+
+/home/ec2-user/kafka_2.12-2.2.1/bin/kafka-topics.sh --zookeeper "z-3.test.1tklkx.c2.kafka.us-east-1.amazonaws.com:2181,z-2.test.1tklkx.c2.kafka.us-east-1.amazonaws.com:2181,z-1.test.1tklkx.c2.kafka.us-east-1.amazonaws.com:2181" --delete --topic trip_status_topic
+
+Create Kafka topic on EC2 (replace zookeeper string)
+
+/home/ec2-user/kafka_2.12-2.2.1/bin/kafka-topics.sh --create --zookeeper "z-3.test.1tklkx.c2.kafka.us-east-1.amazonaws.com:2181,z-2.test.1tklkx.c2.kafka.us-east-1.amazonaws.com:2181,z-1.test.1tklkx.c2.kafka.us-east-1.amazonaws.com:2181" --replication-factor 3 --partitions 1 --topic trip_update_topic
+
+/home/ec2-user/kafka_2.12-2.2.1/bin/kafka-topics.sh --create --zookeeper "z-3.test.1tklkx.c2.kafka.us-east-1.amazonaws.com:2181,z-2.test.1tklkx.c2.kafka.us-east-1.amazonaws.com:2181,z-1.test.1tklkx.c2.kafka.us-east-1.amazonaws.com:2181" --replication-factor 3 --partitions 1 --topic trip_status_topic
+
+aws kafka get-bootstrap-brokers --cluster-arn arn:aws:kafka:us-east-1:620614497509:cluster/test/2dbb304e-79fe-4beb-a02d-35e0fea4524b-2 | grep BootstrapBrokerString\":
+
+Export MTA API key
+
+export MTA_API_KEY=UskS0iAsK06DtSffbgqNi8hlDvApPR833wydQAHG
+
+Run the program with Python3 -> train_arrival_producer.py
+
+Verify that the output is being written to console
+
+/home/ec2-user/kafka_2.12-2.2.1/bin/kafka-console-consumer.sh --bootstrap-server "b-3.test.1tklkx.c2.kafka.us-east-1.amazonaws.com:9092,b-1.test.1tklkx.c2.kafka.us-east-1.amazonaws.com:9092,b-2.test.1tklkx.c2.kafka.us-east-1.amazonaws.com:9092" --topic trip_update_topic --from-beginning
+
+/home/ec2-user/kafka_2.12-2.2.1/bin/kafka-console-consumer.sh --bootstrap-server "b-3.test.1tklkx.c2.kafka.us-east-1.amazonaws.com:9092,b-1.test.1tklkx.c2.kafka.us-east-1.amazonaws.com:9092,b-2.test.1tklkx.c2.kafka.us-east-1.amazonaws.com:9092" --topic trip_status_topic --from-beginning
+
+On EMR (Kafka consumer)
+
+# Clean checkpoint
+
+hdfs dfs -rm -R /user/hadoop/checkpoint
+
+# Copy Spark dependencies for Kafka in EMR
+
+cd /usr/lib/spark/jars
+sudo wget https://repo1.maven.org/maven2/org/apache/spark/spark-streaming-kafka-0-10_2.12/3.0.1/spark-streaming-kafka-0-10_2.12-3.0.1.jar
+sudo wget https://repo1.maven.org/maven2/org/apache/spark/spark-sql-kafka-0-10_2.12/3.0.1/spark-sql-kafka-0-10_2.12-3.0.1.jar
+sudo wget https://repo1.maven.org/maven2/org/apache/kafka/kafka-clients/2.2.1/kafka-clients-2.2.1.jar
+sudo wget https://repo1.maven.org/maven2/org/apache/commons/commons-pool2/2.11.1/commons-pool2-2.11.1.jar
+sudo wget https://repo1.maven.org/maven2/org/apache/spark/spark-streaming-kafka-0-10-assembly_2.12/3.0.1/spark-streaming-kafka-0-10-assembly_2.12-3.0.1.jar
+
+# Run spark streaming notebook. Make sure that train_arrival_producer.py is running to produce streaming data. 
