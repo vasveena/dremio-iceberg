@@ -1,0 +1,24 @@
+1) Create an RDS Aurora MySQL Database 
+2) Turn on binary logging - https://aws.amazon.com/premiumsupport/knowledge-center/enable-binary-logging-aurora/ 
+3) Login to mysql instance, create schema and table, insert some values 
+4) Go to DMS console and do the following
+	a. Create source for the RDS Aurora MySQL DB
+	b. Create target as an S3 bucket/prefix in your account 
+	c. Create a replication instance with same network configs as your database
+ 	d. Create DMS migration task (full load, ongoing replication) with source, target and replication instance created above. Choose the schema and table name from step 3
+ 	e. Start the task and wait until it succeeds
+    f. Check if the files are deposited in S3 target
+5) Create a table in Athena on top of this S3 DMS target as well as an empty Iceberg table
+6) Get the Glue connector from AWS Marketplace - https://aws.amazon.com/marketplace/pp/prodview-iicxofvpqvsio
+	a. Accept terms to subscribe
+	b. Configure the connector. Choose Glue 3.0 as the fulfillment option and 0.12.0-2 as Software version
+	c. Go to Usage -> Activate the Glue connector from AWS Glue Studio
+	d. Provide a name for your connector and select "Create connection and activate connector"
+7) Create a Glue ETL job 
+	a. Select Glue 3.0 and Python3
+	b. Under connections, choose Iceberg Connector for Glue 3.0
+	c. Under job parameters, provide your Iceberg warehouse location 
+	eg: key = --iceberg_job_catalog_warehouse and value = s3://vasveena-test-iceberg/warehouse
+8) Run the Glue job. Once the job completes successfully, query Athena Iceberg table
+9) Now go back to mysql instance and make some changes to the table. Replication in DMS is ongoing so it will take a few mins to deposit new files on S3 target
+10) After that, re-run the Glue ETL. Once the ETL is done, query the Athena Iceberg table again to see the changes
