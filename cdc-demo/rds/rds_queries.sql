@@ -7,10 +7,10 @@ create database sourcedb;
 
 create table sourcedb.products(
   op varchar(10), 
-  product_id long, 
+  product_id int, 
   category varchar(10), 
   product_name varchar(10), 
-  quantity_available long, 
+  quantity_available int, 
   last_update_time varchar(100)
 );
 
