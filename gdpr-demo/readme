@@ -10,7 +10,7 @@
 7) Create a Spark streaming Glue ETL job with the script from Github repo. This ETL takes following parameters -
 
 --iceberg_job_catalog_warehouse	s3://bucket/custdata/
---output_path	s3://streamingicebergdemo-XX
+--output_path	s3://bucket
 --kinesis_arn	arn:aws:kinesis:us-east-1:<AWS Account ID>:stream/demo-data-stream
 --user-jars-first	True
 

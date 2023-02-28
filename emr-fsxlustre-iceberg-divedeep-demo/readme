@@ -1,0 +1,12 @@
+Create an FSx Lustre FS with Scratch Deployment Type
+
+Create an EMR 6.9 cluster with a bootstrap action that creates mount points with the FSx Lustre FS (replace your mount name and FSx DNS name). Choose same AZ as your FSx Lustre for best performance.
+
+Create an EMR Studio or Managed Notebook and attach the above cluster to the notebook
+
+Run the notebook under notebook/
+
+As you write to the Iceberg table, SSH into the cluster and execute the following command to see how FSx is getting asynchronously u
+pdated with the metadata from S3. Metadata reads will be served from FSx Lustre.
+
+ls -ltr /mnt/fsx/warehouse/orders/salesdb.db/orders/data/
