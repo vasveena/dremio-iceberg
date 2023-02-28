@@ -1,0 +1,26 @@
+{
+"year": "{{random.number({"min":2000,"max":2022})}}",
+"month": "{{random.number({"min":1,"max":12})}}",
+"day": "{{random.number({"min":1,"max":30})}}",
+"hour": "{{random.number({"min":0,"max":24})}}",
+"minute": "{{random.number({"min":0,"max":60})}}",
+"customerid": {{random.number({"min":5023,"max":59874})}},
+"firstname" : "{{name.firstName}}",
+"lastname" : "{{name.lastName}}",
+"dateofbirth" : "{{date.past(70)}}",
+"city" : "{{address.city}}",
+"buildingnumber" : {{random.number({"min":63,"max":947})}},
+"streetaddress" : "{{address.streetAddress}}",
+"state" : "{{address.state}}",
+"zipcode" : "{{address.zipCode}}",
+"country" : "{{address.country}}",
+"countrycode" : "{{address.countryCode}}",
+"phonenumber" : "{{phone.phoneNumber}}",
+"productname" : "{{commerce.productName}}",
+"transactionamount": {{random.number(
+{
+"min":10,
+"max":150
+}
+)}}
+}
