@@ -1,0 +1,20 @@
+1) Create Kinesis Data Generator account - https://awslabs.github.io/amazon-kinesis-data-generator/web/help.html
+2) Create Kinesis data stream 
+3) Create an S3 bucket and prefix called "custdata"
+4) In Kinesis Data Generator, choose the region and Kinesis stream. Provide the template for test data generation
+5) Get the Glue connector from AWS Marketplace - https://aws.amazon.com/marketplace/pp/prodview-iicxofvpqvsio
+	a. Accept terms to subscribe
+	b. Configure the connector. Choose Glue 3.0 as the fulfillment option and 0.12.0-2 as Software version
+	c. Go to Usage -> Activate the Glue connector from AWS Glue Studio
+6) Create an Athena table on top of the S3 bucket / prefix from Step 2
+7) Create a Spark streaming Glue ETL job with the script from Github repo. This ETL takes following parameters -
+
+--iceberg_job_catalog_warehouse	s3://bucket/custdata/
+--output_path	s3://streamingicebergdemo-XX
+--kinesis_arn	arn:aws:kinesis:us-east-1:<AWS Account ID>:stream/demo-data-stream
+--user-jars-first	True
+
+Also, under the connector provide the Iceberg Glue MARKETPLACE connector
+8) Run Glue job. It will be in Running state since it is Spark streaming
+9) Run UPSERTs and DELETEs from Athena
+10) Run vacuum on the table to remove unnecessary snapshots and metadata files 
